@@ -1,0 +1,15 @@
+{
+  "name": "api-turnos",
+  "version": "1.0.0",
+  "description": "API para consultar y reservar turnos de una clinica.",
+  "main": "index.js",
+  "scripts": {
+    "test": "http"
+  },
+  "author": "Emiliano Sangoi",
+  "license": "MIT",
+  "dependencies": {
+    "swagger-ui": "^3.0.17",
+    "swagger-ui-dist": "^3.0.17"
+  }
+}

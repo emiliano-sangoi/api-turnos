@@ -1,0 +1,7 @@
+nbproject
+db-source-folder
+vendor
+node_modules
+logs/*
+sitios.txt
+config.php
