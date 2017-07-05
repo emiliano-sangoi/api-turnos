@@ -8,28 +8,65 @@
  *   schemes={"http"},
  *   host="127.0.0.1:8080",
  *   basePath="/api"
+ * 
+ * 
+ * 
+ *   
  * )
  */
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-$app->get('/hello/{name}', function (Request $request, Response $response) {       
+/**
+ * @SWG\Get(
+ *   path="/info",
+ *   summary="Permite consultar información general sobre la API.",
+ *   produces={"application/xml", "application/json"},
+ *   @SWG\Response(
+ *     response=200,
+ *     description="Información general sobre la API"
+ *   )
+ * )
+ */
+$app->get('/info', function (Request $request, Response $response) {       
     
-    $name = $request->getAttribute('name');
-    $response->getBody()->write("Hello, $name");
+    $info = array(
+        'swagger_docs' => '127.0.0.1:8080/',
+        'autor' => 'Emiliano Sangoi',
+        'licencia' => 'GPL v3. Para mas informacion ver: https://www.gnu.org/licenses/gpl-3.0.en.html'
+    );
+    return $response->withJson($info, $st);
     
-    $this->logger->addInfo("$name escribio un mensaje.");
-
-    return $response;
 });
 
-
+/**
+ * @SWG\Get(
+ *   path="/swagger/json",
+ *   summary="Devuelve la documentacion Swagger en formato JSON de la API. Para conocer mas sobre Swagger ir a https://swagger.io/",
+ *   produces={"application/xml", "application/json"},
+ *   @SWG\Response(
+ *     response=200,
+ *     description="Documentacion Swagger en formato JSON. "
+ *   ),
+ *   @SWG\Response(
+ *     response=500,
+ *     description="Error interno."
+ *   )
+ * )
+ */
 $app->get('/swagger/json', function (Request $request, Response $response) {       
     
-    $swagger = \Swagger\scan('routes/');
+    $st = 200;
+    $res = array();
     
-    return $response->withJson($swagger, 201);
+    try{
+        $res = \Swagger\scan('routes/');
+    } catch (\Exception $ex){
+        $res[] = "Error. " . $ex->getMessage();
+        $st = 500;
+    }
+    return $response->withJson($res, $st);
 
 });
 
