@@ -1,12 +1,12 @@
 <?php
 
-
+// *   host="127.0.0.1:8080",
 /**
  * @SWG\Swagger(
  *   title="API Restful para sistema de Gestion de Turnos",
  *   description="Este servicio web fue realizado como parte del TP Final del curso: Desarrollo de Aplicaciones Móviles dictado por el Laboratorio Gugler (UADER, FCyT). ",
  *   schemes={"http"},
- *   host="127.0.0.1:8080",
+ *   host="192.168.0.67:8080",
  *   basePath="/api"
  * 
  * 
@@ -22,7 +22,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
  * @SWG\Get(
  *   path="/info",
  *   summary="Permite consultar información general sobre la API.",
- *   produces={"application/xml", "application/json"},
+ *   produces={"application/json"},
  *   @SWG\Response(
  *     response=200,
  *     description="Información general sobre la API"

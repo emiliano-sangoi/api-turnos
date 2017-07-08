@@ -24,9 +24,17 @@ class UsuariosRepository {
         $this->_dbLink = $db;
     }
 
+    /**
+     * Devuelve el registro asociado a un usuario.
+     * 
+     * @param type $user
+     * @param type $pwd
+     * @return type
+     */
     public function getUserData($user, $pwd) {
 
-        $sql = "SELECT u.*, p.id_paciente FROM usuarios u 
+        $sql = "SELECT u.id_usuario, u.username, u.password, u.apellidos, u.nombres
+            FROM usuarios u 
             LEFT JOIN pacientes p
             ON u.id_usuario = p.usuario_id
             WHERE u.username = :user AND u.password = :pwd";
@@ -36,11 +44,12 @@ class UsuariosRepository {
         $stmt->bindParam(':user', $user, PDO::PARAM_STR);
         $stmt->bindParam(':pwd', $pwd, PDO::PARAM_STR);
 
-        $result = array('ok' => false, 'data' => null, 'msg' => '');
+        $result = array('ok' => false, 'data' => array(), 'msg' => '');
         if ($stmt->execute()) {
-            //var_dump($stmt->fetchAll());exit;
             $result['ok'] = true;
-            $result['data'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	    while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+	            $result['data'] = $row;
+	    }
         } else {
             $result['msg'] = $stmt->errorInfo();
         }
@@ -61,6 +70,33 @@ class UsuariosRepository {
         
         if(!is_null($id)){
             $sql .= " WHERE m.id_medico = $id";                        
+        }
+        
+        $stmt = $this->_dbLink->query($sql);
+        $result = array('ok' => false, 'data' => null, 'msg' => '');
+        if($stmt){
+            $result['ok'] = true;
+            $result['data'] = $stmt->fetchAll();
+            
+        }else{
+            $result['msg'] = $stmt->errorInfo();
+        }        
+
+        return $result;
+
+    }
+    
+    /**
+     * Devuelve un listado con todos los pacientes.
+     * @param type $id
+     * @return type
+     */
+    public function getPacientes($id = null) {
+        
+        $sql = "SELECT u.id_usuario, u.username, u.password, u.apellidos, u.nombres FROM pacientes p INNER JOIN usuarios u ON u.id_usuario = p.usuario_id";
+        
+        if(!is_null($id)){
+            $sql .= " WHERE p.id_paciente = $id";                        
         }
         
         $stmt = $this->_dbLink->query($sql);

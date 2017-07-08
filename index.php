@@ -71,11 +71,18 @@
     <script src="node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js"></script>
     <script>
         
+        <?php include 'config.php'; ?>
+        var url = "<?php echo SWAGGER_DOCS_URL_JSON; ?>";
+        
+        //url: "http://127.0.0.1:8080/api/swagger/json",
+        
         window.onload = function () {
             // Build a system
             const ui = SwaggerUIBundle({
 //                url: "http://petstore.swagger.io/v2/swagger.json",
-                url: "http://127.0.0.1:8080/api/swagger/json",
+                
+                //url: "http://192.168.0.67:8080/api/swagger/json",
+                url: url ,
                 dom_id: '#swagger-ui',
                 presets: [
                     SwaggerUIBundle.presets.apis,

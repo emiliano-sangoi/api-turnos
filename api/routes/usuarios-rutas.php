@@ -44,14 +44,15 @@ $app->post('/login', function (Request $request, Response $response) {
     $body = json_decode($request->getBody(), true);
     $repo = new APITurnos\Repository\UsuariosRepository($this->db);
 
-    $st = 405;
+    $st = 500;
     $response_body = array("msg" => "No se encontro el ningun usuario con las credenciales suministradas");
     $result = $repo->getUserData($body["username"], $body["password"]);
+	//$result = $repo->getUserData("ritchie.marvin","2048d");
     if ($result['ok']) {
-        $st = 200;
         $response_body = $result['data'];
+	$st = count($response_body) > 0 ? 200 : 401;
     }
-
+	//var_dump($response_body);
     return $response->withJson($response_body, $st);
     
 });
@@ -62,7 +63,7 @@ $app->post('/login', function (Request $request, Response $response) {
  * @SWG\Get(
  *   path="/pacientes",
  *   summary="Listado de todos los pacientes existentes",
- *   produces={"application/xml", "application/json"},
+ *   produces={"application/json"},
  *   @SWG\Response(
  *     response=200,
  *     description="Listado de todos los pacientes existentes"
@@ -75,21 +76,21 @@ $app->post('/login', function (Request $request, Response $response) {
  */
 $app->get('/pacientes', function (Request $request, Response $response) {
 
-    $pdo = $this->db;
-    $result = $pdo->query("SELECT * FROM pacientes p INNER JOIN usuarios u ON u.id_usuario = p.usuario_id");
-    $pacientes = $result->fetchAll();
+    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
 
-    /* return $response->wiwithStatus(200)
-      ->withHeader('Content-Type', 'application/json')
-      ->getBody()->write(json_encode($obras_sociales)); */
-    return $response->withJson($pacientes, 200);
+    $result = $repo->getPacientes();
+    if ($result['ok']) {
+        return $response->withJson($result['data'], 200);
+    }
+
+    return $response->withJson(array(), 405);
 });
 
 /**
  * @SWG\Get(
  *      path="/pacientes/{id}",
  *      summary="Busca el paciente con el id indicado",
- *      produces={"application/xml", "application/json"},
+ *      produces={"application/json"},
  *     @SWG\Parameter(
  *         name="id",
  *         in="path",
@@ -114,19 +115,16 @@ $app->get('/pacientes', function (Request $request, Response $response) {
  */
 $app->get('/pacientes/{id}', function (Request $request, Response $response) {
 
-    $paciente = array();
-    $st_code = 404;
+    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
 
     $id = $request->getAttribute('id');
-    if ($id) {
-        $sql = "SELECT * FROM pacientes p INNER JOIN usuarios u ON u.id_usuario = p.usuario_id  WHERE p.id_paciente = $id";
-        $pdo = $this->db;
-        $result = $pdo->query($sql);
-        $paciente = $result->fetchAll();
-        $st_code = 200;
+    $result = $repo->getPacientes($id);
+    if ($result['ok']) {
+        return $response->withJson($result['data'], 200);
     }
 
-    return $response->withJson($paciente, $st_code);
+    return $response->withJson(array(), 405);
+    
 });
 
 
@@ -134,7 +132,7 @@ $app->get('/pacientes/{id}', function (Request $request, Response $response) {
  * @SWG\Get(
  *   path="/medicos",
  *   summary="Devuelve un listado de todos los medicos existentes",
- *   produces={"application/xml", "application/json"},
+ *   produces={"application/json"},
  *   @SWG\Response(
  *     response=200,
  *     description="Listado de todos los medicos existentes"
@@ -182,11 +180,10 @@ $app->get('/medicos', function (Request $request, Response $response) {
  *          response=200,
  *          description="Devuelve informacion del medico"
  * 
- *      )    
+ *      )
  * )
  */
 $app->get('/medicos/{id}', function (Request $request, Response $response) {
-
     
     $repo = new APITurnos\Repository\UsuariosRepository($this->db);
 
