@@ -33,25 +33,23 @@ class UsuariosRepository {
      */
     public function getUserData($user, $pwd) {
 
-        $sql = "SELECT u.id_usuario, u.username, u.password, u.apellidos, u.nombres
+        $sql = "SELECT u.id_usuario, p.id_paciente, u.username, u.password, u.apellidos, u.nombres, u.tipo_doc, u.nro_doc, u.email, u.direccion, u.fecha_nac 
             FROM usuarios u 
             LEFT JOIN pacientes p
             ON u.id_usuario = p.usuario_id
-            WHERE u.username = :user AND u.password = :pwd";
+            WHERE u.username = :user AND u.password = :pwd LIMIT 1";
 
         $stmt = $this->_dbLink->prepare($sql);
 
         $stmt->bindParam(':user', $user, PDO::PARAM_STR);
         $stmt->bindParam(':pwd', $pwd, PDO::PARAM_STR);
-
-        $result = array('ok' => false, 'data' => array(), 'msg' => '');
+          
+        $result = new RepoResult();
         if ($stmt->execute()) {
-            $result['ok'] = true;
-	    while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-	            $result['data'] = $row;
-	    }
+            $result->setOk(true);
+            $result->setData($stmt->fetchAll());
         } else {
-            $result['msg'] = $stmt->errorInfo();
+            $result->setMsg($stmt->errorInfo());
         }
 
         return $result;
@@ -66,7 +64,8 @@ class UsuariosRepository {
      */
     public function getMedicos($id = null) {
         
-        $sql = "SELECT * FROM medicos m INNER JOIN usuarios u ON u.id_usuario = m.usuario_id";
+        $sql = "SELECT u.id_usuario, m.nro_matricula, u.username, u.password, u.apellidos, u.nombres, u.tipo_doc, u.nro_doc, u.email, u.direccion, u.fecha_nac  "
+                . "FROM medicos m INNER JOIN usuarios u ON u.id_usuario = m.usuario_id";
         
         if(!is_null($id)){
             $sql .= " WHERE m.id_medico = $id";                        
@@ -80,6 +79,38 @@ class UsuariosRepository {
             
         }else{
             $result['msg'] = $stmt->errorInfo();
+        }        
+
+        return $result;
+
+    }
+    
+
+    /**
+     * Devuelve un listado con todos los medicos con la especialidad indicada.
+     * 
+     * @param type $id
+     * @return \APITurnos\Repository\RepoResult
+     */
+    public function getMedicosConEspecialidad($id) {
+        
+        $sql = "SELECT u.id_usuario, m.nro_matricula, u.username, u.password, u.apellidos, u.nombres, u.tipo_doc, u.nro_doc, u.email, u.direccion, u.fecha_nac "
+                . "FROM medicos m "
+                . "INNER JOIN especialidades e "
+                . "ON m.especialidad_id = id_especialidad "
+                . "INNER JOIN usuarios u "
+                . "ON u.id_usuario = m.usuario_id "
+                . "WHERE e.id_especialidad = ?";
+        
+        
+        $stmt = $this->_dbLink->prepare($sql);
+        $result = new RepoResult();
+        if($stmt->execute(array($id))){
+            $result->setData($stmt->fetchAll(PDO::FETCH_ASSOC));
+            $result->setOk(true);
+            
+        }else{
+            $result->setMsg($stmt->errorInfo());
         }        
 
         return $result;

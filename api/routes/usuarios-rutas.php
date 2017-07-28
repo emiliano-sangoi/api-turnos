@@ -14,13 +14,13 @@ use \Psr\Http\Message\ResponseInterface as Response;
  *     description="Permite determinar si el usuario y contraseña ingresado existen en la base de datos.",
  *     produces={"application/json"},
  *     @SWG\Parameter(
- *         name="user",
+ *         name="username",
  *         in="body",
  *         description="Nombre de usuario",
  *         required=true
  *     ),
  *     @SWG\Parameter(
- *         name="pwd",
+ *         name="password",
  *         in="body",
  *         description="Contraseña",
  *         required=true
@@ -30,7 +30,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
  *         description="Usuario y/o contraseña son validos."
  *     ),
  *     @SWG\Response(
- *         response=405,
+ *         response=401,
  *         description="Usuario y/o contraseña son incorrectos.",
  *     ),
  *     @SWG\Response(
@@ -44,16 +44,17 @@ $app->post('/login', function (Request $request, Response $response) {
     $body = json_decode($request->getBody(), true);
     $repo = new APITurnos\Repository\UsuariosRepository($this->db);
 
-    $st = 500;
-    $response_body = array("msg" => "No se encontro el ningun usuario con las credenciales suministradas");
     $result = $repo->getUserData($body["username"], $body["password"]);
-	//$result = $repo->getUserData("ritchie.marvin","2048d");
-    if ($result['ok']) {
-        $response_body = $result['data'];
-	$st = count($response_body) > 0 ? 200 : 401;
+    if ($result->isOk()) {
+        $response_body = $result->getData();
+        $user = array_pop($response_body);
+	if($user){
+            return $response->withJson($user, 200);	
+	}else{
+            return $response->withJson(array("msg" => "No se encontro el ningun usuario con las credenciales suministradas"), 401);	
+	}
     }
-	//var_dump($response_body);
-    return $response->withJson($response_body, $st);
+    return $response->withJson("", 500);
     
 });
 
@@ -194,4 +195,40 @@ $app->get('/medicos/{id}', function (Request $request, Response $response) {
     }
 
     return $response->withJson(array(), 405);
+});
+
+/**
+ * @SWG\Get(
+ *      path="/medicos/especialidad/{id}",
+ *      summary="Busca todos los medicos con cierta especialidad",
+ *      produces={"application/json"},
+ *     @SWG\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="Id de la especialidad",
+ *         required=true,
+ *         type="integer" 
+ *     ),
+ *      @SWG\Response(
+ *          response=500,
+ *          description="Error interno"
+ *      ),
+ *      @SWG\Response(
+ *          response=200,
+ *          description="Listado de medicos"
+ * 
+ *      )
+ * )
+ */
+$app->get('/medicos/especialidad/{id}', function (Request $request, Response $response) {
+    
+    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
+
+    $id = $request->getAttribute('id');
+    $result = $repo->getMedicosConEspecialidad($id);
+    if ($result->isOk()) {
+        return $response->withJson($result->getData(), 200);
+    }
+
+    return $response->withJson(array(), 500);
 });

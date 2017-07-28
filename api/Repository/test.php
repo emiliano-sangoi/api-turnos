@@ -12,4 +12,4 @@ $pdo = new PDO("mysql:host=" . $config['db']['host'] . ";dbname=" . $config['db'
 $o = new \APITurnos\Repository\UsuariosRepository($pdo);
 
 
-var_dump($o->getUserData("carmelo43", "5415"));
+var_dump($o->getUserData("javonte81", "3894"));

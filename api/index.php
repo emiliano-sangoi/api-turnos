@@ -14,9 +14,13 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \PDO;
 
-require '../vendor/autoload.php';
-require '../config.php';
-require 'Repository/UsuariosRepository.php';
+require_once '../vendor/autoload.php';
+require_once '../config.php';
+require_once 'Repository/RepoResult.php';
+require_once 'Repository/UsuariosRepository.php';
+require_once 'Repository/OSRepository.php';
+require_once 'Repository/EspecialidadesRepository.php';
+require_once 'Repository/TurnoRepository.php';
 
 $app = new \Slim\App(array("settings" => $config));
 
@@ -50,6 +54,9 @@ $container['db'] = function ($c) {
 
 require_once 'routes/app-rutas.php';
 require_once 'routes/usuarios-rutas.php';
+require_once 'routes/os-rutas.php';
+require_once 'routes/especialidades-rutas.php';
+require_once 'routes/turnos-rutas.php';
 
 
 

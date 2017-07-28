@@ -1,12 +1,11 @@
 <?php
 
-// *   host="127.0.0.1:8080",
 /**
  * @SWG\Swagger(
  *   title="API Restful para sistema de Gestion de Turnos",
  *   description="Este servicio web fue realizado como parte del TP Final del curso: Desarrollo de Aplicaciones Móviles dictado por el Laboratorio Gugler (UADER, FCyT). ",
  *   schemes={"http"},
- *   host="192.168.0.67:8080",
+ *   host="192.168.0.17:8080",
  *   basePath="/api"
  * 
  * 
@@ -32,7 +31,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 $app->get('/info', function (Request $request, Response $response) {       
     
     $info = array(
-        'swagger_docs' => '127.0.0.1:8080/',
+        'swagger_docs' => ROOT_URL - '/api',
         'autor' => 'Emiliano Sangoi',
         'licencia' => 'GPL v3. Para mas informacion ver: https://www.gnu.org/licenses/gpl-3.0.en.html'
     );
