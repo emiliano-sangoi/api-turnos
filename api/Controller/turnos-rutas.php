@@ -1,7 +1,11 @@
 <?php
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+namespace APITurnos\Controller;
+
+use APITurnos\Repository\TurnoRepository;
+use APITurnos\Controller\Util;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * @SWG\Get(
@@ -29,7 +33,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 $app->get('/horarios/medico/{id}', function (Request $request, Response $response) {
 
 
-    $repo = new APITurnos\Repository\TurnoRepository($this->db);
+    $repo = new TurnoRepository($this->db);
     $id_medico = $request->getAttribute('id');
     $from = new DateTime();
     $result = $repo->getHorariosAtencion($id_medico, $from->getTimestamp());
@@ -41,19 +45,18 @@ $app->get('/horarios/medico/{id}', function (Request $request, Response $respons
     return $response->withJson(array(), 500);
 });
 
+
 $app->get('/horarios/medico/{id}/dia/{fecha_Ymd}', function (Request $request, Response $response) {
 
 
-    $repo = new APITurnos\Repository\TurnoRepository($this->db);
+    $repoTurno = new TurnoRepository($this->db);
     $id_medico = $request->getAttribute('id');
     $fecha_Ymd = $request->getAttribute('fecha_Ymd');
-    $result = $repo->getHorariosAtencion($id_medico, $fecha_Ymd);
+    $res = $repoTurno->getHorariosAtencion($id_medico, $fecha_Ymd);
+        
+    $apiResponse = Util::buildApiResponse($res, $repoTurno->getUltimoError(), 200);
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
     
-    if ($result->isOk()) {
-        return $response->withJson($result->getData(), 200);
-    }
-
-    return $response->withJson(array(), 500);
 });
 
 
@@ -86,11 +89,11 @@ $app->get('/horarios/medico/{id}/dia/{fecha_Ymd}', function (Request $request, R
  *     ),
  *      @SWG\Response(
  *          response=500,
- *          description="Error interno"
+ *          description="Error interno o de validacion"
  *      ),
  *      @SWG\Response(
- *          response=200,
- *          description="Listado de horarios"
+ *          response=201,
+ *          description="Turno creado correctamente."
  * 
  *      )
  * )
@@ -98,24 +101,13 @@ $app->get('/horarios/medico/{id}/dia/{fecha_Ymd}', function (Request $request, R
 $app->post('/turno/nuevo', function (Request $request, Response $response) {
 
     $body = json_decode($request->getBody(), true);
-    $repoTurno = new APITurnos\Repository\TurnoRepository($this->db);
+    $repoTurno = new TurnoRepository($this->db);
     $res = $repoTurno->nuevoTurno($body);
-    
-    $apiResponse = new APITurnos\Routes\APIResponse();
-    
-    if(!$res){
-        $apiResponse->setMsg($repoTurno->getUltimoError());        
-    }else{
-        $apiResponse->setOk(true);
-        $apiResponse->setStatusCode(200);
-        $apiResponse->setData($res);
-    }
 
-    
+    $apiResponse = Util::buildApiResponse($res, $repoTurno->getUltimoError(), 201);
+
     return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
     
 });
-
-
 
 

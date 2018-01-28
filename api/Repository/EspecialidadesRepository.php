@@ -7,74 +7,77 @@ use \PDO;
 /**
  * 
  */
-class EspecialidadesRepository {
-
-    private $_dbLink;
-
-    public function __construct(PDO $db) {
-        $this->_dbLink = $db;
-    }
+class EspecialidadesRepository extends BaseRepository {
 
     /**
      * 
-     * @return \APITurnos\Repository\RepoResult
+     * @param int $id_esp
+     * @param boolean $con_medicos
+     * @return mixed
      */
     public function getEspecialidades($id_esp = null, $con_medicos = false) {
         
-        if($con_medicos){
+        $this->resetErrores();
+        
+        if (!is_null($id_esp) && !is_numeric($id_esp)) {
+            $this->_ultimoError = "El id de la especialidad debe ser un numero entero.";
+            return false;
+        }        
+
+        if ($con_medicos) {
             //Selecciona aquellas especialidades que tengan un medico asociado
             $sql = "SELECT e.id_especialidad, e.nom_especialidad FROM medicos m INNER JOIN especialidades e ON m.especialidad_id = e.id_especialidad";
-        }else{
+        } else {
             $sql = "SELECT id_especialidad, nom_especialidad FROM especialidades e";
         }
-        
-        
-        if(!is_null($id_esp)){
-            $sql .= " WHERE id_especialidad = $id_esp";
-        }
-        
+
+        $sql .= is_null($id_esp) ? '' : " WHERE id_especialidad = $id_esp";
         $sql .= " GROUP BY e.id_especialidad";
-        
-        $stmt = $this->_dbLink->prepare($sql);                
 
-        $result = new RepoResult();
-        if ($stmt->execute()) {
-            
-            $stmt->bindColumn(1, $id);
-            $stmt->bindColumn(2, $nom);
-            //$stmt->bindColumn(3, $desc);
-            
-            while ($row = $stmt->fetch()) {
-                $result->addDataRow(array(
-                    "id_especialidad" => $id,
-                    "nom_especialidad" => utf8_encode($nom),
-                    //"desc_especialidad" => utf8_encode($desc)
-                ));
-            }
-            
-            $result->setOk(true);
+        $stmt = $this->_dbLink->prepare($sql);
 
-        } else {
-            $result->setMsg($stmt->errorInfo());
+        if (!$this->ejecutarStmt($stmt)) {
+            return false;
         }
 
-        return $result;
+        $stmt->bindColumn(1, $id);
+        $stmt->bindColumn(2, $nom);
+
+        $especialidades = array();
+        while ($row = $stmt->fetch()) {
+
+            $especialidades[] = array(
+                "id_especialidad" => $id,
+                "nom_especialidad" => utf8_encode($nom),
+                    //"desc_especialidad" => utf8_encode($desc)
+            );
+        }
+
+        return $especialidades;
     }
-    
-    
+
     /**
      * Devuelve true si la especialidad con id existe o false en caso contrario.
+     * 
      * @param type $id_esp
      * @return boolean
      */
     public function existe($id_esp) {
-        if(is_int($id_esp)){
-            $stmt = $this->_dbLink->query("SELECT 1 FROM especialidades WHERE id_especialidad = $id_esp");
-            return $stmt->rowCount() > 0;            
+        
+        $this->resetErrores();
+        
+        if (!is_numeric($id_esp)) {
+            $this->_ultimoError = "El id de la especialidad debe ser un numero entero.";
+            return false;
         }
-        return false;
-        
-        
+                
+        $sql = "SELECT 1 FROM especialidades WHERE id_especialidad = $id_esp";      
+        $stmt = $this->ejecutarQuery($sql);
+        if(!$stmt){
+            return false;
+        }
+                        
+        return $stmt->rowCount() > 0;        
     }
 
 }

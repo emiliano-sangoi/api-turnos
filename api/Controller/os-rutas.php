@@ -1,5 +1,7 @@
 <?php
 
+namespace APITurnos\Controller;
+
 /*
  * En este archivo se guardan diferentes rutas para acceder a usuarios, medicos y/o pacientes.
  */
@@ -9,9 +11,16 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 /**
  * @SWG\Get(
- *   path="/os",
+ *   path="/os/{id}",
  *   summary="Listado de todas las obras sociales existentes.",
  *   produces={"application/json"},
+ *  @SWG\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="Id de la obra social",
+ *         required=false,
+ *         type="integer" 
+ *     ),
  *   @SWG\Response(
  *     response=200,
  *     description="Listado de obras sociales."
@@ -22,16 +31,16 @@ use \Psr\Http\Message\ResponseInterface as Response;
  *   )
  * )
  */
-$app->get('/os', function (Request $request, Response $response) {
+$app->get('/os[/{id}]', function (Request $request, Response $response) {
 
-    $repo = new APITurnos\Repository\OSRepository($this->db);
+    $repoOs = new \APITurnos\Repository\OSRepository($this->db);
 
-    $result = $repo->getObrasSociales();
-    if ($result->isOk()) {
-        return $response->withJson($result->getData(), 200);
-    }
-
-    return $response->withJson(array(), 500);
+    $id_os = $request->getAttribute("id");
+    $res = $repoOs->getObrasSociales($id_os);
+    
+    $apiResponse = Util::buildApiResponse($res, $repoOs->getUltimoError(), 200);
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
+        
 });
 
 

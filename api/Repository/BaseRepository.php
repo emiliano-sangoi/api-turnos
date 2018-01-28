@@ -3,9 +3,11 @@
 namespace APITurnos\Repository;
 
 use PDO;
+use Exception;
+use PDOException;
 
-class BaseRepository{
-    
+class BaseRepository {
+
     /**
      *
      * @var PDO 
@@ -17,7 +19,7 @@ class BaseRepository{
         $this->_dbLink = $db;
         $this->_ultimoError = '';
     }
-    
+
     public function getDbLink() {
         return $this->_dbLink;
     }
@@ -35,12 +37,51 @@ class BaseRepository{
         $this->_ultimoError = $_ultimoError;
         return $this;
     }
-    
-    public function resetErrores(){
+
+    public function resetErrores() {
         $this->_ultimoError = '';
         return $this;
     }
 
+    public function ejecutarStmt(\PDOStatement &$stmt) {
 
+        try {
+
+            if (!$stmt->execute()) {
+                $this->_ultimoError = $stmt->errorInfo();
+                return false;
+            }
+
+            return true;
+        } catch (PDOException $ex) {
+            $this->_ultimoError = "Ocurrio un error al intentar procesar la transaccion.";
+        } catch (Exception $ex) {
+            $this->_ultimoError = "Ocurrio un error al intentar procesar la transaccion.";
+        }
+
+        return false;
+    }
     
+    public function ejecutarQuery($sql) {
+
+        try {
+            
+            
+            $stmt = $this->_dbLink->query($sql);
+
+            if (!$stmt) {
+                $this->_ultimoError = $this->_dbLink->errorInfo();
+                return false;
+            }
+
+            return $stmt;
+        } catch (PDOException $ex) {
+            $this->_ultimoError = "Ocurrio un error al intentar procesar la transaccion.";
+        } catch (Exception $ex) {
+            $this->_ultimoError = "Ocurrio un error al intentar procesar la transaccion.";
+        }
+
+        return false;
+    }
+
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace APITurnos\Controller;
+
 /*
  * En este archivo se guardan diferentes rutas para acceder a usuarios, medicos y/o pacientes.
  */

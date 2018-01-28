@@ -1,4 +1,6 @@
 {
+    "name":"emiliano-sangoi/api-turnos",
+    "description":"REST Service para la gestion de turnos",
     "require": {
         "slim/slim": "^3.0",
         "monolog/monolog": "^1.23",
@@ -8,7 +10,7 @@
     },
     "autoload": {
         "psr-4": {
-            "": "classes/"
+            "APITurnos\\" : "api/"
         }
     }
 }

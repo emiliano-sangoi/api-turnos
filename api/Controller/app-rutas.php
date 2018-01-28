@@ -1,5 +1,7 @@
 <?php
 
+namespace APITurnos\Controller;
+
 /**
  * @SWG\Swagger(
  *   title="API Restful para sistema de Gestion de Turnos",

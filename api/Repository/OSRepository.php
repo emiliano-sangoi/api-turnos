@@ -16,7 +16,7 @@ class OSRepository extends BaseRepository{
      * Devuelve todas las afiliaciones asociadas al paciente.
      * 
      * @param int $id_paciente
-     * @return \APITurnos\Repository\RepoResult 
+     * @return mixed 
      */
     public function getAfiliaciones($id_paciente){                   
         
@@ -46,44 +46,45 @@ class OSRepository extends BaseRepository{
         
         $stmt = $this->_dbLink->query($sql);
                         
-        if (! $stmt) {
-            $this->_ultimoError = $stmt->errorInfo();
+        if(!$this->ejecutarStmt($stmt)){
             return false;
-        }
+        }                
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);  
+        return $stmt->fetchAll(); 
     }
     
     /**
      * Devuelve todas las obras sociales existentes.
      * 
-     * @param type $id
-     * @return \APITurnos\Repository\RepoResult
+     * @param int $id
+     * @return mixed
      */
-    public function getObrasSociales($id = null){
+    public function getObrasSociales($id_os = null){
+        
+        $this->resetErrores();
+        
+        if (!is_null($id_os) && !is_numeric($id_os)) {
+            $this->_ultimoError = "El id de la obra social debe ser un numero entero.";
+            return false;
+        }             
         
         $sql = "SELECT * FROM obras_sociales";
         
-        if(!is_null($id)){
-            $sql .= " WHERE id_obra_social = :id";                        
+        if(!is_null($id_os)){
+            $sql .= " WHERE id_os = :id";                        
         }
         
         $stmt = $this->_dbLink->prepare($sql);
         
-        if(!is_null($id)){
-            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        if(!is_null($id_os)){
+            $stmt->bindParam(':id', $id_os, \PDO::PARAM_INT);
         }
         
-        $result = new RepoResult();
-        if($stmt->execute()){
-            $result->setOk(true);
-            $result->setData($stmt->fetchAll());            
-            
-        }else{
-            $result->setMsg($stmt->errorInfo());
-        }        
-
-        return $result;
+        if(!$this->ejecutarStmt($stmt)){
+            return false;
+        }                
+        
+        return $stmt->fetchAll();       
     }
     
     /**
