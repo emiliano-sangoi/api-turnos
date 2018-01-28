@@ -31,7 +31,7 @@ $app->get('/especialidades', function (Request $request, Response $response) {
 
     $repo = new APITurnos\Repository\EspecialidadesRepository($this->db);
 
-    $result = $repo->getEspecialidades();
+    $result = $repo->getEspecialidades(null, true);
     if ($result->isOk()) {
         return $response->withJson(
                         $result->getData(), count($result->getData()) > 0 ? 200 : 404);

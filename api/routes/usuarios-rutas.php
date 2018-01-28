@@ -45,6 +45,8 @@ $app->post('/login', function (Request $request, Response $response) {
     $repo = new APITurnos\Repository\UsuariosRepository($this->db);
 
     $result = $repo->getUserData($body["username"], $body["password"]);
+    global $container;
+    $container['logger']->info("lala");    
     if ($result->isOk()) {
         $response_body = $result->getData();
         $user = array_pop($response_body);

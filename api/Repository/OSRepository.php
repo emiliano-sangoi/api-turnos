@@ -8,24 +8,18 @@
 
 namespace APITurnos\Repository;
 
-use \PDO;
+use PDO;
 
+class OSRepository extends BaseRepository{
 
-class OSRepository{
-    private $_dbLink;
-
-    public function __construct(PDO $db) {
-        $this->_dbLink = $db;
-    }
-    
     /**
+     * Devuelve todas las afiliaciones asociadas al paciente.
      * 
      * @param int $id_paciente
      * @return \APITurnos\Repository\RepoResult 
      */
-    public function getAfiliaciones($id_paciente){               
-
-//sleep(2);
+    public function getAfiliaciones($id_paciente){                   
+        
         $sql = "SELECT
                     os.id_os AS 'idOs',
                     os.nombre,
@@ -39,20 +33,25 @@ class OSRepository{
                 ON p.id_paciente = a.paciente_id
                 INNER JOIN obras_sociales os
                 ON os.id_os = a.os_id
-                WHERE a.fecha_fin IS NULL AND p.id_paciente = ?";
+                WHERE a.fecha_fin IS NULL";
         
-        $stmt = $this->_dbLink->prepare($sql);
+        $this->resetErrores();
         
-        $result = new RepoResult();
-        if ($stmt->execute(array($id_paciente))) {
-            $result->setOk(true);
-            $result->setData($stmt->fetchAll(PDO::FETCH_ASSOC));            
-        } else {
-            $result->setMsg($stmt->errorInfo());            
-        }                
-
-        return $result;
+        if( !is_null($id_paciente) && !is_numeric($id_paciente) ){
+            $this->_ultimoError = "El id del paciente debe ser un numero entero.";
+            return false;
+        }else{
+            $sql .= " AND p.id_paciente = $id_paciente";
+        }
         
+        $stmt = $this->_dbLink->query($sql);
+                        
+        if (! $stmt) {
+            $this->_ultimoError = $stmt->errorInfo();
+            return false;
+        }
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);  
     }
     
     /**

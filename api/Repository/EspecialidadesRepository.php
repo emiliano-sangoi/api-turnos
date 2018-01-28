@@ -19,13 +19,21 @@ class EspecialidadesRepository {
      * 
      * @return \APITurnos\Repository\RepoResult
      */
-    public function getEspecialidades($id_esp = null) {
-
-        $sql = "SELECT id_especialidad, nom_especialidad FROM especialidades e";
+    public function getEspecialidades($id_esp = null, $con_medicos = false) {
+        
+        if($con_medicos){
+            //Selecciona aquellas especialidades que tengan un medico asociado
+            $sql = "SELECT e.id_especialidad, e.nom_especialidad FROM medicos m INNER JOIN especialidades e ON m.especialidad_id = e.id_especialidad";
+        }else{
+            $sql = "SELECT id_especialidad, nom_especialidad FROM especialidades e";
+        }
+        
         
         if(!is_null($id_esp)){
             $sql .= " WHERE id_especialidad = $id_esp";
         }
+        
+        $sql .= " GROUP BY e.id_especialidad";
         
         $stmt = $this->_dbLink->prepare($sql);                
 

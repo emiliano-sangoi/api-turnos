@@ -6,24 +6,35 @@
  * and open the template in the editor.
  */
 
-namespace APITurnos\Repository;
+namespace APITurnos\Routes;
 
 /**
  * Description of RepoResult
  *
  * @author emiliano
  */
-class RepoResult {
+class APIResponse {
     private $msg;
     private $ok;
     private $data;
-    
-    function __construct($msg = "", $ok = false, $data = array()) {
+    private $statusCode;
+            
+    function __construct($msg = "", $ok = false, $data = array(), $statusCode = 500) {
         $this->msg = $msg;
         $this->ok = $ok;
         $this->data = $data;
+        $this->statusCode = $statusCode;
     }
     
+    public function toArray(){
+        return array(
+            "msg" => $this->msg,
+            "ok" => $this->ok,
+            "data" => $this->data,
+            "status_code" => $this->statusCode
+        );
+    }
+            
     function getMsg() {
         return $this->msg;
     }
@@ -58,6 +69,14 @@ class RepoResult {
         $this->data[] = $row;
         
         return $this;
+    }
+
+    function getStatusCode() {
+        return $this->statusCode;
+    }
+
+    function setStatusCode($statusCode) {
+        $this->statusCode = $statusCode;
     }
 
 

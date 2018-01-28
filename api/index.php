@@ -5,6 +5,20 @@
  * 
  * https://www.slimframework.com/docs/tutorial/first-app.html
  * 
+ * ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+ * API | SET UP & RUN
+ * ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+ * Instrucciones para utilizar la API:
+ * 
+ * - Conocer la IP publica:
+ *      $ hostname -I
+ * - Correr un servidor built-in en la ip publica con un puerto que se encuentre libre:
+ *      $ php -S 192.168.1.108:8000
+ * - Actualizar la IP y puerto en la app movil.
+ * - Actualizar la IP y el puerto en el script que genera el JSON de la documentacion Swagger: 
+ *      /var/www/html/api-turnos/api/routes/app-rutas.php, linea 8
+ * 
+ * ///////////////////////////////////////////////////////////////////////////////////////////////////////////
  * Create Routes
  */
 
@@ -13,10 +27,12 @@ namespace APITurnos;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \PDO;
+use Monolog;
 
 require_once '../vendor/autoload.php';
 require_once '../config.php';
-require_once 'Repository/RepoResult.php';
+require_once 'routes/APIResponse.php';
+require_once 'Repository/BaseRepository.php';
 require_once 'Repository/UsuariosRepository.php';
 require_once 'Repository/OSRepository.php';
 require_once 'Repository/EspecialidadesRepository.php';
