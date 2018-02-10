@@ -6,8 +6,9 @@ namespace APITurnos\Controller;
  * En este archivo se guardan diferentes rutas para acceder a usuarios, medicos y/o pacientes.
  */
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use APITurnos\Repository\UsuariosRepository;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * @SWG\Post(
@@ -44,64 +45,27 @@ use \Psr\Http\Message\ResponseInterface as Response;
 $app->post('/login', function (Request $request, Response $response) {
 
     $body = json_decode($request->getBody(), true);
-    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
+    $repoUsuarios = new UsuariosRepository($this->db);
 
-    $result = $repo->getUserData($body["username"], $body["password"]);
-    global $container;
-    $container['logger']->info("lala");    
-    if ($result->isOk()) {
-        $response_body = $result->getData();
-        $user = array_pop($response_body);
-	if($user){
-            return $response->withJson($user, 200);	
-	}else{
-            return $response->withJson(array("msg" => "No se encontro el ningun usuario con las credenciales suministradas"), 401);	
-	}
-    }
-    return $response->withJson("", 500);
+    $res = $repoUsuarios->getUserData($body["username"], $body["password"]);
     
-});
-
-
-
-/**
- * @SWG\Get(
- *   path="/pacientes",
- *   summary="Listado de todos los pacientes existentes",
- *   produces={"application/json"},
- *   @SWG\Response(
- *     response=200,
- *     description="Listado de todos los pacientes existentes"
- *   ),
- *   @SWG\Response(
- *     response=500,
- *     description="Error interno."
- *   )
- * )
- */
-$app->get('/pacientes', function (Request $request, Response $response) {
-
-    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
-
-    $result = $repo->getPacientes();
-    if ($result['ok']) {
-        return $response->withJson($result['data'], 200);
-    }
-
-    return $response->withJson(array(), 405);
+    $apiResponse = Util::buildApiResponse($res, $repoUsuarios->getUltimoError(), 200);    
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
+    
 });
 
 /**
  * @SWG\Get(
  *      path="/pacientes/{id}",
- *      summary="Busca el paciente con el id indicado",
+ *      summary="Busca el paciente con el id indicado. Si no se especifica id, devuelve todos los pacientes",
  *      produces={"application/json"},
  *     @SWG\Parameter(
  *         name="id",
  *         in="path",
  *         description="Id del paciente",
  *         required=false,
- *         type="integer" 
+ *         type="integer",
+ *         default="" 
  *     ),
  *      @SWG\Response(
  *          response=500,
@@ -118,47 +82,15 @@ $app->get('/pacientes', function (Request $request, Response $response) {
  *      )    
  * )
  */
-$app->get('/pacientes/{id}', function (Request $request, Response $response) {
-
-    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
-
-    $id = $request->getAttribute('id');
-    $result = $repo->getPacientes($id);
-    if ($result['ok']) {
-        return $response->withJson($result['data'], 200);
-    }
-
-    return $response->withJson(array(), 405);
+$app->get('/pacientes/[{id}]', function (Request $request, Response $response) {
     
-});
-
-
-/**
- * @SWG\Get(
- *   path="/medicos",
- *   summary="Devuelve un listado de todos los medicos existentes",
- *   produces={"application/json"},
- *   @SWG\Response(
- *     response=200,
- *     description="Listado de todos los medicos existentes"
- *   ),
- *   @SWG\Response(
- *     response=500,
- *     description="Error interno."
- *   )
- * )
- */
-$app->get('/medicos', function (Request $request, Response $response) {
+    $repoUsuarios = new UsuariosRepository($this->db);
+    $id_paciente = $request->getAttribute('id');
+    $res = $repoUsuarios->getPacientes($id_paciente);
     
-    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
-
-    $result = $repo->getMedicos();
-    if ($result['ok']) {
-        return $response->withJson($result['data'], 200);
-    }
-
-    return $response->withJson(array(), 405);
-
+    $apiResponse = Util::buildApiResponse($res, $repoUsuarios->getUltimoError(), 200);    
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
+    
 });
 
 /**
@@ -171,15 +103,12 @@ $app->get('/medicos', function (Request $request, Response $response) {
  *         in="path",
  *         description="Id del medico",
  *         required=false,
- *         type="integer" 
+ *         type="integer",
+ *         default="" 
  *     ),
  *      @SWG\Response(
  *          response=500,
  *          description="Error interno"
- *      ),
- *      @SWG\Response(
- *          response=404,
- *          description="No se encontro ningún medico con el id pasado como parametro."
  *      ),
  *      @SWG\Response(
  *          response=200,
@@ -188,17 +117,15 @@ $app->get('/medicos', function (Request $request, Response $response) {
  *      )
  * )
  */
-$app->get('/medicos/{id}', function (Request $request, Response $response) {
+$app->get('/medicos/[{id}]', function (Request $request, Response $response) {    
+        
+    $repoUsuarios = new UsuariosRepository($this->db);
+    $id_medico = $request->getAttribute('id');
+    $res = $repoUsuarios->getMedicos($id_medico);
     
-    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
-
-    $id = $request->getAttribute('id');
-    $result = $repo->getMedicos($id);
-    if ($result['ok']) {
-        return $response->withJson($result['data'], 200);
-    }
-
-    return $response->withJson(array(), 405);
+    $apiResponse = Util::buildApiResponse($res, $repoUsuarios->getUltimoError(), 200);    
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
+    
 });
 
 /**
@@ -226,13 +153,11 @@ $app->get('/medicos/{id}', function (Request $request, Response $response) {
  */
 $app->get('/medicos/especialidad/{id}', function (Request $request, Response $response) {
     
-    $repo = new APITurnos\Repository\UsuariosRepository($this->db);
-
-    $id = $request->getAttribute('id');
-    $result = $repo->getMedicosConEspecialidad($id);
-    if ($result->isOk()) {
-        return $response->withJson($result->getData(), 200);
-    }
-
-    return $response->withJson(array(), 500);
+    $repoMedicos = new UsuariosRepository($this->db);
+    $id_medico = $request->getAttribute('id');
+    $res = $repoMedicos->getMedicosConEspecialidad($id_medico);
+    
+    $apiResponse = Util::buildApiResponse($res, $repoMedicos->getUltimoError(), 200);    
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );    
+    
 });

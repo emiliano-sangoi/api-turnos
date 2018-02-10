@@ -14,12 +14,12 @@ namespace APITurnos\Controller;
  * @author emi88
  */
 class Util {
-    
+
     function __construct() {
         
     }
 
-        /**
+    /**
      * 
      * @param mixed $repo_res Respuesta obtenida desde un repositorio.
      * @param string $ultimo_error Ultimo error obtenido.
@@ -29,13 +29,20 @@ class Util {
 
         $apiResponse = new APIResponse();
 
-        if (!$repo_res) {
-            $apiResponse->setMsg($ultimo_error);
-            $apiResponse->setStatusCode($default_error_code);
+        if (!$repo_res) {                      
+
+            if (is_array($repo_res) && count($repo_res) === 0) {
+                $apiResponse->setStatusCode(200);
+                $apiResponse->setMsg("No se encontro ningun registro.");  
+            }else{
+                $apiResponse->setStatusCode($default_error_code);
+                $apiResponse->setMsg($ultimo_error);  
+            }
+            
         } else {
             $apiResponse->setOk(true);
-            $apiResponse->setStatusCode($default_success_code);
             $apiResponse->setData($repo_res);
+            $apiResponse->setStatusCode($default_success_code);
         }
 
         return $apiResponse;

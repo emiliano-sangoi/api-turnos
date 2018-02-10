@@ -7,7 +7,7 @@ namespace APITurnos\Controller;
  *   title="API Restful para sistema de Gestion de Turnos",
  *   description="Este servicio web fue realizado como parte del TP Final del curso: Desarrollo de Aplicaciones Móviles dictado por el Laboratorio Gugler (UADER, FCyT). ",
  *   schemes={"http"},
- *   host="192.168.1.104:8000",
+ *   host="192.168.1.104:8080",
  *   basePath="/api"
  * 
  * 
@@ -62,7 +62,7 @@ $app->get('/swagger/json', function (Request $request, Response $response) {
     $res = array();
     
     try{
-        $res = \Swagger\scan('routes/');
+        $res = \Swagger\scan('Controller/');
     } catch (\Exception $ex){
         $res[] = "Error. " . $ex->getMessage();
         $st = 500;

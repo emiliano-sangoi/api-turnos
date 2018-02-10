@@ -19,7 +19,8 @@ use \Psr\Http\Message\ResponseInterface as Response;
  *         in="path",
  *         description="Id de la obra social",
  *         required=false,
- *         type="integer" 
+ *         type="integer",
+ *         default="" 
  *     ),
  *   @SWG\Response(
  *     response=200,
@@ -31,7 +32,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
  *   )
  * )
  */
-$app->get('/os[/{id}]', function (Request $request, Response $response) {
+$app->get('/os/[{id}]', function (Request $request, Response $response) {
 
     $repoOs = new \APITurnos\Repository\OSRepository($this->db);
 
@@ -73,18 +74,14 @@ $app->get('/os[/{id}]', function (Request $request, Response $response) {
 $app->get('/os/afiliaciones/paciente/{id_paciente}', function (Request $request, Response $response) {
 
 
-    $repo = new APITurnos\Repository\OSRepository($this->db);
-
+    $repoOs = new \APITurnos\Repository\OSRepository($this->db);
     $id_paciente = $request->getAttribute('id_paciente');
-    if (is_int((int) $id_paciente)) {
-        $result = $repo->getAfiliaciones($id_paciente);
-        if ($result->isOk()) {
-            return $response->withJson(
-                            $result->getData(), count($result->getData()) > 0 ? 200 : 404);
-        }
-    }
+    
+    $res = $repoOs->getAfiliaciones($id_paciente);
+        
+    $apiResponse = Util::buildApiResponse($res, $repoOs->getUltimoError(), 200);
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
 
-    return $response->withJson('', 500);
 });
 
 

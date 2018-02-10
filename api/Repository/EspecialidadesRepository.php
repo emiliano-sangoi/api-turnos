@@ -18,7 +18,7 @@ class EspecialidadesRepository extends BaseRepository {
     public function getEspecialidades($id_esp = null, $con_medicos = false) {
         
         $this->resetErrores();
-        
+
         if (!is_null($id_esp) && !is_numeric($id_esp)) {
             $this->_ultimoError = "El id de la especialidad debe ser un numero entero.";
             return false;
@@ -35,7 +35,6 @@ class EspecialidadesRepository extends BaseRepository {
         $sql .= " GROUP BY e.id_especialidad";
 
         $stmt = $this->_dbLink->prepare($sql);
-
         if (!$this->ejecutarStmt($stmt)) {
             return false;
         }
@@ -51,6 +50,10 @@ class EspecialidadesRepository extends BaseRepository {
                 "nom_especialidad" => utf8_encode($nom),
                     //"desc_especialidad" => utf8_encode($desc)
             );
+            
+            if($id_esp){
+                return $especialidades[0];
+            }
         }
 
         return $especialidades;

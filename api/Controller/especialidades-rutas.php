@@ -20,7 +20,8 @@ use \APITurnos\Repository\EspecialidadesRepository;
  *         in="path",
  *         description="Id de la especialidad",
  *         required=false,
- *         type="integer" 
+ *         type="integer" ,
+ *         default=""
  *     ),
  *   @SWG\Response(
  *     response=200,
@@ -36,10 +37,9 @@ use \APITurnos\Repository\EspecialidadesRepository;
  *   )
  * )
  */
-$app->get('/especialidades[/{id}]', function (Request $request, Response $response) {
+$app->get('/especialidades/[{id}]', function (Request $request, Response $response) {
 
-    $repoEsp = new EspecialidadesRepository($this->db);
-    
+    $repoEsp = new EspecialidadesRepository($this->db);    
     $id_esp = $request->getAttribute('id');
     $res = $repoEsp->getEspecialidades($id_esp, true);
     

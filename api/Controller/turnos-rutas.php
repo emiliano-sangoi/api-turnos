@@ -32,17 +32,15 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  */
 $app->get('/horarios/medico/{id}', function (Request $request, Response $response) {
 
-
-    $repo = new TurnoRepository($this->db);
+    $repoTurno = new TurnoRepository($this->db);
     $id_medico = $request->getAttribute('id');
-    $from = new DateTime();
-    $result = $repo->getHorariosAtencion($id_medico, $from->getTimestamp());
+    $from = new \DateTime();
+    $res = $repoTurno->getHorariosAtencion($id_medico, $from->getTimestamp());
+        
     
-    if ($result->isOk()) {
-        return $response->withJson($result->getData(), 200);
-    }
+    $apiResponse = Util::buildApiResponse($res, $repoTurno->getUltimoError(), 200);
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
 
-    return $response->withJson(array(), 500);
 });
 
 
@@ -74,16 +72,16 @@ $app->get('/horarios/medico/{id}/dia/{fecha_Ymd}', function (Request $request, R
  *         type="integer" 
  *     ),
  *     @SWG\Parameter(
- *         name="Id de la obra social",
- *         in="path",
- *         description="Obra social del paciente.",
- *         required=false,
+ *         name="horario_atencion_id",
+ *         in="body",
+ *         description="Id del horario de atencion elegido por el usuario.",
+ *         required=true,
  *         type="integer" 
  *     ),
  *     @SWG\Parameter(
- *         name="Id de la obra social",
- *         in="path",
- *         description="Fecha del dia a buscar (Formato Y-m-d).",
+ *         name="obra_social_id",
+ *         in="body",
+ *         description="Id de la obra social elegida por el paciente.",
  *         required=false,
  *         type="integer" 
  *     ),
@@ -110,4 +108,73 @@ $app->post('/turno/nuevo', function (Request $request, Response $response) {
     
 });
 
+/**
+ * @SWG\Post(
+ *      path="/turno/baja",
+ *      summary="Da de baja un nuevo turno",
+ *      produces={"application/json"},
+ *     @SWG\Parameter(
+ *         name="id",
+ *         in="body",
+ *         description="Id del turno",
+ *         required=true,
+ *         type="integer" 
+ *     ),
+ *      @SWG\Response(
+ *          response=500,
+ *          description="Error interno o de validacion"
+ *      ),
+ *      @SWG\Response(
+ *          response=201,
+ *          description="Turno anulado correctamente."
+ * 
+ *      )
+ * )
+ */
+$app->post('/turno/baja', function (Request $request, Response $response) {
 
+    $body = json_decode($request->getBody(), true);
+    $id_turno = isset($body['id']) ? $body['id'] : null;        
+    $repoTurno = new TurnoRepository($this->db);
+    $res = $repoTurno->bajaTurno($id_turno);
+
+    $apiResponse = Util::buildApiResponse($res, $repoTurno->getUltimoError(), 200);
+
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
+    
+});
+
+
+/**
+ * @SWG\Get(
+ *      path="/turno/paciente/{id}",
+ *      summary="Busca todos los turnos para el paciente especificado.",
+ *      produces={"application/json"},
+ *     @SWG\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="Id del paciente",
+ *         required=true,
+ *         type="integer" 
+ *     ),
+ *      @SWG\Response(
+ *          response=500,
+ *          description="Error interno"
+ *      ),
+ *      @SWG\Response(
+ *          response=200,
+ *          description="Listado de turnos"
+ * 
+ *      )
+ * )
+ */
+$app->get('/turno/paciente/{id}', function (Request $request, Response $response) {
+
+    $repoTurno = new TurnoRepository($this->db);
+    $id_paciente = $request->getAttribute('id');
+    $res = $repoTurno->getTurnosPorPaciente($id_paciente);
+            
+    $apiResponse = Util::buildApiResponse($res, $repoTurno->getUltimoError(), 200);
+    return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
+
+});
