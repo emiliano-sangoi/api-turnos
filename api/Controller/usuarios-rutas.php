@@ -21,14 +21,16 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  *         in="body",
  *         description="Nombre de usuario",
  *         required=true,
- *         type="string" 
+ *         type="string",
+ *         @SWG\Schema(type="string")
  *     ),
  *     @SWG\Parameter(
  *         name="password",
  *         in="body",
  *         description="Contraseña",
  *         required=true,
- *         type="string"
+ *         type="string",
+ *         @SWG\Schema(type="string")
  *     ),
  *     @SWG\Response(
  *         response=200,

@@ -69,21 +69,24 @@ $app->get('/horarios/medico/{id}/dia/{fecha_Ymd}', function (Request $request, R
  *         in="body",
  *         description="Id del paciente",
  *         required=true,
- *         type="integer" 
+ *         type="integer",
+ *         @SWG\Schema(type="integer")
  *     ),
  *     @SWG\Parameter(
  *         name="horario_atencion_id",
  *         in="body",
  *         description="Id del horario de atencion elegido por el usuario.",
  *         required=true,
- *         type="integer" 
+ *         type="integer",
+ *         @SWG\Schema(type="integer")
  *     ),
  *     @SWG\Parameter(
  *         name="obra_social_id",
  *         in="body",
  *         description="Id de la obra social elegida por el paciente.",
  *         required=false,
- *         type="integer" 
+ *         type="integer",
+ *         @SWG\Schema(type="integer")
  *     ),
  *      @SWG\Response(
  *          response=500,
@@ -118,7 +121,8 @@ $app->post('/turno/nuevo', function (Request $request, Response $response) {
  *         in="body",
  *         description="Id del turno",
  *         required=true,
- *         type="integer" 
+ *         type="integer",
+ *         @SWG\Schema(type="integer")
  *     ),
  *      @SWG\Response(
  *          response=500,
