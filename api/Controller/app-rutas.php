@@ -5,10 +5,10 @@ namespace APITurnos\Controller;
 /**
  * @SWG\Swagger(
  *   title="API Restful para sistema de Gestion de Turnos",
- *   description="Este servicio web fue realizado como parte del TP Final del curso: Desarrollo de Aplicaciones Móviles dictado por el Laboratorio Gugler (UADER, FCyT). ",
+ *   info="Este servicio web fue realizado como parte del TP Final del curso: Desarrollo de Aplicaciones Móviles dictado por el Laboratorio Gugler (UADER, FCyT). ",
  *   schemes={"http"},
- *   host="192.168.1.104:8080",
- *   basePath="/api"
+ *   host="localhost:80",
+ *   basePath="/api-turnos/api/index.php"
  * 
  * 
  * 

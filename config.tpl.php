@@ -13,9 +13,20 @@ $config['db']['host']   = "localhost";
 $config['db']['user']   = "";
 $config['db']['pass']   = "";
 $config['db']['dbname'] = "";
-$config['host'] = $_SERVER['SERVER_NAME'];
-$config['port'] = $_SERVER['SERVER_PORT'];
-$config['path'] = '/api-turnos/api/index.php';
+
+/**
+ * IMPORTANTE:
+ * 
+ * Los valores de host y port tambien deben ser configurados en la anotacion de Swagger, archivo: 
+ *  api/Controller/app-rutas.php
+ * Lineas 10 y 11
+ * 
+ * De lo contrario se estarn generando mal las rutas que se utilizaran en Swagger UI
+ */
+$config['host'] = "localhost";
+$config['port'] = 80;
+$config['basePath'] = '/api-turnos/api/index.php';
+
 
 /*
  * Ejemplo:
