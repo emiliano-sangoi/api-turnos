@@ -34,5 +34,5 @@ $config['basePath'] = '/api-turnos/api/index.php';
  */
 
 
-define('ROOT_URL', "http://" . $config['host'] . ':' . $config['port'] . $config['path']);
+define('ROOT_URL', "http://" . $config['host'] . ':' . $config['port'] . $config['basePath']);
 define('SWAGGER_DOCS_URL_JSON', ROOT_URL . "/swagger/json");
