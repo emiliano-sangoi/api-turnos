@@ -26,9 +26,9 @@ class EspecialidadesRepository extends BaseRepository {
 
         if ($con_medicos) {
             //Selecciona aquellas especialidades que tengan un medico asociado
-            $sql = "SELECT e.id_especialidad, e.nom_especialidad FROM medicos m INNER JOIN especialidades e ON m.especialidad_id = e.id_especialidad";
+            $sql = "SELECT e.id_especialidad, LCASE(e.nom_especialidad) FROM medicos m INNER JOIN especialidades e ON m.especialidad_id = e.id_especialidad";
         } else {
-            $sql = "SELECT id_especialidad, nom_especialidad FROM especialidades e";
+            $sql = "SELECT id_especialidad, LCASE(nom_especialidad) FROM especialidades e";
         }
 
         $sql .= is_null($id_esp) ? '' : " WHERE id_especialidad = $id_esp";
@@ -44,6 +44,8 @@ class EspecialidadesRepository extends BaseRepository {
 
         $especialidades = array();
         while ($row = $stmt->fetch()) {
+            
+            $nom = ucwords($nom);
 
             $especialidades[] = array(
                 "id_especialidad" => $id,
@@ -56,6 +58,7 @@ class EspecialidadesRepository extends BaseRepository {
             }
         }
 
+        dump($especialidades);exit;
         return $especialidades;
     }
 
