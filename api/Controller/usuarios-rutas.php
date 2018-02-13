@@ -53,7 +53,7 @@ $app->post('/login', function (Request $request, Response $response) {
 
     $res = $repoUsuarios->getUserData($body["username"], $body["password"]);
     
-    $apiResponse = Util::buildApiResponse($res, $repoUsuarios->getUltimoError(), 200);    
+    $apiResponse = Util::buildApiResponse($res, $repoUsuarios->getUltimoError(), 200, 401);    
     return $response->withJson( $apiResponse->toArray(), $apiResponse->getStatusCode() );
     
 });
