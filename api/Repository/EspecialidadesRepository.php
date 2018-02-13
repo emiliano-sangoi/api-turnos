@@ -58,7 +58,7 @@ class EspecialidadesRepository extends BaseRepository {
             }
         }
 
-        dump($especialidades);exit;
+
         return $especialidades;
     }
 
